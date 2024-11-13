@@ -4,6 +4,7 @@ import br.grupointegrado.lanches.dto.ClienteRequestDTO;
 import br.grupointegrado.lanches.model.Cliente;
 import br.grupointegrado.lanches.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,15 +17,18 @@ public class ClienteController {
     private ClienteRepository repository;
 
     @GetMapping
-    public List<Cliente> findAll() {
-        return this.repository.findAll();
+    public ResponseEntity<List<Cliente>> findAll() {
+//        return this.repository.findAll();
+        return ResponseEntity.ok(this.repository.findAll());
     }
 
     // @PathVariable é usado para freezar que o parâmetro "id" será passado na URL da requisição
     @GetMapping("/{id}")
-    public Cliente findById(@PathVariable Integer id) {
-        return this.repository.findById(id).
+    public ResponseEntity<Cliente> findById(@PathVariable Integer id) {
+        Cliente cliente = this.repository.findById(id).
                 orElseThrow( () -> new IllegalArgumentException("Cliente não encontrado."));
+
+        return ResponseEntity.ok(cliente);
     }
 
     @PostMapping
@@ -51,11 +55,12 @@ public class ClienteController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteById(@PathVariable Integer id) {
         Cliente cliente = this.repository.findById(id).
-                orElseThrow( () -> new IllegalArgumentException("Cliente não encontrado.") );
+                orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado."));
 
         this.repository.delete(cliente);
+        return ResponseEntity.noContent().build();
     }
 
 }
