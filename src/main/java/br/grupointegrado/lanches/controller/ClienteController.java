@@ -1,8 +1,11 @@
 package br.grupointegrado.lanches.controller;
 
 import br.grupointegrado.lanches.dto.ClienteRequestDTO;
+import br.grupointegrado.lanches.dto.EnderecoRequestDTO;
 import br.grupointegrado.lanches.model.Cliente;
+import br.grupointegrado.lanches.model.Endereco;
 import br.grupointegrado.lanches.repository.ClienteRepository;
+import br.grupointegrado.lanches.repository.EnderecoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,18 +17,21 @@ import java.util.List;
 public class ClienteController {
 
     @Autowired
-    private ClienteRepository repository;
+    private ClienteRepository clienteRepository;
+
+    @Autowired
+    private EnderecoRepository enderecoRepository;
 
     @GetMapping
     public ResponseEntity<List<Cliente>> findAll() {
 //        return this.repository.findAll();
-        return ResponseEntity.ok(this.repository.findAll());
+        return ResponseEntity.ok(this.clienteRepository.findAll());
     }
 
     // @PathVariable é usado para freezar que o parâmetro "id" será passado na URL da requisição
     @GetMapping("/{id}")
     public ResponseEntity<Cliente> findById(@PathVariable Integer id) {
-        Cliente cliente = this.repository.findById(id).
+        Cliente cliente = this.clienteRepository.findById(id).
                 orElseThrow( () -> new IllegalArgumentException("Cliente não encontrado."));
 
         return ResponseEntity.ok(cliente);
@@ -39,28 +45,38 @@ public class ClienteController {
         cliente.setEmail(dto.email());
         cliente.setTelefone(dto.telefone());
 
-        return this.repository.save(cliente);
+        return this.clienteRepository.save(cliente);
     }
 
     @PutMapping("/{id}")
     public Cliente update(@PathVariable Integer id, @RequestBody ClienteRequestDTO dto ) {
-        Cliente cliente = this.repository.findById(id).
+        Cliente cliente = this.clienteRepository.findById(id).
                 orElseThrow( () -> new IllegalArgumentException("Cliente não encontrado."));
 
         cliente.setNome(dto.nome());
         cliente.setEmail(dto.email());
         cliente.setTelefone(dto.telefone());
 
-        return this.repository.save(cliente);
+        return this.clienteRepository.save(cliente);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Integer id) {
-        Cliente cliente = this.repository.findById(id).
+        Cliente cliente = this.clienteRepository.findById(id).
                 orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado."));
 
-        this.repository.delete(cliente);
+        this.clienteRepository.delete(cliente);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/add-endereco")
+    public ResponseEntity<Cliente> addEndereco(@PathVariable Integer id, @RequestBody Endereco endereco) {
+        Cliente cliente = this.clienteRepository.findById(id).
+                orElseThrow( () -> new IllegalArgumentException("Cliente não encontrado"));
+
+        endereco.setCliente(cliente);
+        this.enderecoRepository.save(endereco);
+        return ResponseEntity.ok(cliente);
     }
 
 }

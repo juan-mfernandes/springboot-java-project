@@ -1,12 +1,16 @@
 package br.grupointegrado.lanches.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "clientes")
 public class Cliente {
 
-    @Column
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column
@@ -18,8 +22,10 @@ public class Cliente {
     @Column
     private String telefone;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @OneToMany(mappedBy = "cliente")
+    @JsonIgnoreProperties("cliente")
+    private List<Endereco> enderecos;
+
     public Integer getId() {
         return id;
     }
@@ -50,5 +56,13 @@ public class Cliente {
 
     public void setTelefone(String telefone) {
         this.telefone = telefone;
+    }
+
+    public List<Endereco> getEnderecos() {
+        return enderecos;
+    }
+
+    public void setEnderecos(List<Endereco> enderecos) {
+        this.enderecos = enderecos;
     }
 }
